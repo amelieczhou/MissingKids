@@ -33,7 +33,7 @@ import java.util.List;
 public class RegisterActivity extends Activity implements Validator.ValidationListener,View.OnClickListener {
 
     @NotEmpty(messageResId=R.string.name_hint)
-    @Length(max=5, messageResId=R.string.name_length_hint)
+    @Length(max=20, messageResId=R.string.name_length_hint)
     @Order(1)
     public EditText et_name;
 
@@ -132,9 +132,11 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("status");
                         if(status){
-                            System.out.println("true");
                             Intent i = new Intent(RegisterActivity.this , MainActivity.class);
                             startActivity(i);
+                            Looper.prepare();
+                            Toast.makeText(RegisterActivity.this,jsonObject.getString("msg"),Toast.LENGTH_SHORT).show();
+                            Looper.loop();
                         }else{
                             Looper.prepare();
                             Toast.makeText(RegisterActivity.this,jsonObject.getString("msg"),Toast.LENGTH_SHORT).show();
@@ -148,8 +150,6 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
                 }
             }
         }).start();
-        Intent i = new Intent(RegisterActivity.this , MainActivity.class);
-        startActivity(i);
     }
 
 

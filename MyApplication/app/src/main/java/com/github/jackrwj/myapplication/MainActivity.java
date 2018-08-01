@@ -54,7 +54,7 @@ public class MainActivity extends Activity implements Validator.ValidationListen
         setContentView(R.layout.activity_main);
         et_email = findViewById(R.id.email_edit);
         et_pwd = findViewById(R.id.password_edit);
-        responseText = findViewById(R.id.response);
+//        responseText = findViewById(R.id.response);
         btn_login = findViewById(R.id.login);
         btn_register = findViewById(R.id.register);
 
@@ -117,9 +117,11 @@ public class MainActivity extends Activity implements Validator.ValidationListen
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("status");
                         if(status){
-                            System.out.println("true");
                             Intent i = new Intent(MainActivity.this , page1.class);
                             startActivity(i);
+                            Looper.prepare();
+                            Toast.makeText(MainActivity.this,jsonObject.getString("msg"),Toast.LENGTH_SHORT).show();
+                            Looper.loop();
                         }else{
                             System.out.println("false");
                             Looper.prepare();
