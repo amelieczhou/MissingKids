@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Missing Kids</string>
+    <string name="login_label">Login</string>
+    <string name="register_label">Register</string>
+    <string name="login_hint">input your email</string>
+    <string name="register_hint">input your password</string>
+    <string name="errorMessage">not null</string>
+
+
+
+    <string name="name_hint">name can not be null</string>
+    <string name="name_length_hint">name is too long</string>
+    <string name="pwd_hint">password too short</string>
+    <string name="confirm_pwd_hint">two password different</string>
+    <string name="tel_hint">input right number</string>
+    <string name="name_label">Name</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password_label">Password again</string>
+    <string name="tel_label">tel</string>
+    <string name="email_label">Email</string>
+</resources>
