@@ -1,21 +1,26 @@
 <resources>
     <string name="app_name">Missing Kids</string>
-    <string name="login_label">Login</string>
-    <string name="register_label">Register</string>
-    <string name="login_hint">input your email</string>
-    <string name="register_hint">input your password</string>
-    <string name="errorMessage">not null</string>
+    <string name="login_label">LOGIN</string>
+    <string name="register_label">REGISTER</string>
+    <string name="login_hint">请输入账号</string>
+    <string name="register_hint">请输入密码</string>
+    <string name="errorMessage">不能为空</string>
+    <string name="email_hint">请输入有效邮箱</string>
 
 
 
-    <string name="name_hint">name can not be null</string>
-    <string name="name_length_hint">name is too long</string>
-    <string name="pwd_hint">password too short</string>
-    <string name="confirm_pwd_hint">two password different</string>
-    <string name="tel_hint">input right number</string>
-    <string name="name_label">Name</string>
-    <string name="password_label">Password</string>
-    <string name="confirm_password_label">Password again</string>
-    <string name="tel_label">tel</string>
-    <string name="email_label">Email</string>
+    <string name="name_hint">姓名不能为空</string>
+    <string name="name_length_hint">姓名长度应为2到15位</string>
+    <string name="pwd_hint">密码不能少于6位</string>
+    <string name="confirm_pwd_hint">两次密码不一致</string>
+    <string name="tel_hint">电话号码应为8到11位</string>
+    <string name="name_label">姓名</string>
+    <string name="password_label">密码</string>
+    <string name="confirm_password_label">确认密码</string>
+    <string name="tel_label">手机号</string>
+    <string name="email_label">邮箱</string>
+
+
+    <string name="age_hint">年龄应为3位以内</string>
+    <string name="time_hint">时间不能为空</string>
 </resources>

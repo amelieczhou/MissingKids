@@ -1,29 +1,31 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: 13601
+ * Date: 2018/7/18
+ * Time: 19:06
+ */
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
-{
-    use Notifiable;
+class User extends Model{
+    public $table = 'user';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
+    public $timestamps = true;
+
+    public function getDateFormat(){
+        return time();
+    }
+
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password','tel','state',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+    protected function asDateTime($value)
+    {
+        return $value;
+    }
 }

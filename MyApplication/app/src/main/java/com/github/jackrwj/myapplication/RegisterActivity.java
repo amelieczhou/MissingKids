@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -33,11 +34,11 @@ import java.util.List;
 public class RegisterActivity extends Activity implements Validator.ValidationListener,View.OnClickListener {
 
     @NotEmpty(messageResId=R.string.name_hint)
-    @Length(max=20, messageResId=R.string.name_length_hint)
+    @Length(min=2,max=20, messageResId=R.string.name_length_hint)
     @Order(1)
     public EditText et_name;
 
-    @Password(min =6, scheme = Password.Scheme.ANY,messageResId =R.string.pwd_hint)
+    @Password(min=6, scheme = Password.Scheme.ANY,messageResId =R.string.pwd_hint)
     @Order(2)
     protected EditText et_pwd;
 
@@ -49,7 +50,7 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
     @Order(4)
     public EditText et_tel;
 
-    @Email
+    @Email(messageResId =R.string.email_hint)
     @Order(5)
 
     protected EditText et_email;
@@ -96,57 +97,70 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
                 text_tel = et_tel.getText().toString();
                 text_email = et_email.getText().toString();
 
-                HttpURLConnection connection = null;
-                BufferedReader reader = null;
+                String path = "http://10.0.2.2:8000/api/register";
                 try {
-                    URL url = new URL("http://10.0.2.2:8000/api/register?name=" + text_name + "&pwd=" + text_pwd + "&tel=" + text_tel + "&email=" + text_email + "&password=" + text_pwd);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(8000);
-                    connection.setReadTimeout(8000);
-                    InputStream in = connection.getInputStream();
-                    //下面对获取到的输入流进行读取
-                    reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null){
-                        response.append(line);
+                    URL url = new URL(path);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setConnectTimeout(5000);
+                    connection.setRequestMethod("POST");
+
+                    //数据准备
+                    String data = "name="+text_name+"&password="+text_pwd+"&email="+text_email+"&tel="+text_tel;
+                    //至少要设置的两个请求头
+                    connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                    connection.setRequestProperty("Content-Length", data.length()+"");
+
+
+                    //post的方式提交实际上是留的方式提交给服务器
+                    connection.setDoOutput(true);
+                    OutputStream outputStream = connection.getOutputStream();
+                    outputStream.write(data.getBytes());
+
+                    //获得结果码
+                    int responseCode = connection.getResponseCode();
+                    if(responseCode ==200){
+                        //请求成功
+//                        InputStream is = connection.getInputStream();
+                        InputStream in = connection.getInputStream();
+//                    //下面对获取到的输入流进行读取
+                        BufferedReader reader = null;
+                        reader = new BufferedReader(new InputStreamReader(in));
+                        StringBuilder response = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null){
+                            response.append(line);
+                        }
+                        result = response.toString();
+                        Log.i("abc",result);
+                    }else {
+                        //请求失败
+                        Log.i("abc","no");
+                        Toast ts = Toast.makeText(RegisterActivity.this,"post请求，请重试!", Toast.LENGTH_LONG);
                     }
-                    result = response.toString();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }finally {
-                    if (reader != null){
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (connection != null){
-                        connection.disconnect();
-                    }
                     //发送完成后的操作
                     try {
                         //第一步，生成Json字符串格式的JSON对象
                         JSONObject jsonObject = new JSONObject(result);
-                        Boolean status = jsonObject.getBoolean("status");
+                        Boolean status = jsonObject.getBoolean("success");
                         if(status){
-                            Intent i = new Intent(RegisterActivity.this , MainActivity.class);
+                            Intent i = new Intent(RegisterActivity.this, MainActivity.class);
                             startActivity(i);
                             Looper.prepare();
-                            Toast.makeText(RegisterActivity.this,jsonObject.getString("msg"),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
                             Looper.loop();
                         }else{
                             Looper.prepare();
-                            Toast.makeText(RegisterActivity.this,jsonObject.getString("msg"),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
                             Looper.loop();
                         }
                     }
                     catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+
                 }
             }
         }).start();

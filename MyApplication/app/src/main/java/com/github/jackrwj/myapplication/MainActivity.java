@@ -23,24 +23,44 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static java.net.Proxy.Type.HTTP;
 
 
 public class MainActivity extends Activity implements Validator.ValidationListener,View.OnClickListener {
-    @Email
+    @Email(messageResId =R.string.email_hint)
     @Order(1)
     protected EditText et_email;
     @Password(min =6, scheme = Password.Scheme.ANY,messageResId =R.string.pwd_hint)
     @Order(2)
 
     protected EditText et_pwd;
-    protected TextView responseText;
     private Validator validator;
     protected Button btn_login;
     protected Button btn_register;
@@ -63,83 +83,100 @@ public class MainActivity extends Activity implements Validator.ValidationListen
 
         validator = new Validator(this);
         validator.setValidationListener(this);
+
+
     }
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.login){
+        if(view.getId() == R.id.login){
             validator.validate();
         }else{
-            Intent i = new Intent(MainActivity.this , RegisterActivity.class);
+            Intent i = new Intent(MainActivity.this ,page1.class);
             startActivity(i);
         }
     }
+
 
     public void  sendHttpRequest(){
         //开启线程来发起网络请求
         new Thread(new Runnable() {
             @Override
             public void run() {
+
                 text_email = et_email.getText().toString();
                 text_pwd = et_pwd.getText().toString();
-                HttpURLConnection connection = null;
-                BufferedReader reader = null;
+                String path = "http://132.232.27.134/api/login";
                 try {
-                    URL url = new URL("http://10.0.2.2:8000/api/login?email=" + text_email + "&password=" + text_pwd);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(8000);
-                    connection.setReadTimeout(8000);
-                    InputStream in = connection.getInputStream();
-                    //下面对获取到的输入流进行读取
-                    reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null){
-                        response.append(line);
+                    URL url = new URL(path);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setConnectTimeout(5000);
+                    connection.setRequestMethod("POST");
+
+                    //数据准备
+                    String data = "email="+text_email+"&password="+text_pwd;
+                    //至少要设置的两个请求头
+                    connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+                    connection.setRequestProperty("Content-Length", data.length()+"");
+
+
+                    //post的方式提交实际上是留的方式提交给服务器
+                    connection.setDoOutput(true);
+                    OutputStream outputStream = connection.getOutputStream();
+                    outputStream.write(data.getBytes());
+
+                    //获得结果码
+                    int responseCode = connection.getResponseCode();
+                    if(responseCode ==200){
+                        //请求成功
+//                        InputStream is = connection.getInputStream();
+                        InputStream in = connection.getInputStream();
+//                    //下面对获取到的输入流进行读取
+                        BufferedReader reader = null;
+                        reader = new BufferedReader(new InputStreamReader(in));
+                        StringBuilder response = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null){
+                            response.append(line);
+                        }
+                        result = response.toString();
+                        Log.i("abc",result);
+                    }else {
+                        //请求失败
+                        Log.i("abc","no");
                     }
-                    result = response.toString();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }finally {
-                    if (reader != null){
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (connection != null){
-                        connection.disconnect();
-                    }
                     //发送完成后的操作
                     try {
                         //第一步，生成Json字符串格式的JSON对象
                         JSONObject jsonObject = new JSONObject(result);
-                        Boolean status = jsonObject.getBoolean("status");
+                        Boolean status = jsonObject.getBoolean("success");
                         if(status){
                             Intent i = new Intent(MainActivity.this , page1.class);
                             startActivity(i);
                             Looper.prepare();
-                            Toast.makeText(MainActivity.this,jsonObject.getString("msg"),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
                             Looper.loop();
                         }else{
-                            System.out.println("false");
                             Looper.prepare();
-                            Toast.makeText(MainActivity.this,jsonObject.getString("msg"),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
                             Looper.loop();
                         }
                     }
                     catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+
                 }
             }
         }).start();
+
     }
+
+
     @Override
     public void onValidationSucceeded() {
-        //TODO:验证成功之后的逻辑处理
         sendHttpRequest();
     }
 
@@ -159,18 +196,6 @@ public class MainActivity extends Activity implements Validator.ValidationListen
             }
         }
     }
-
-//    //打印错误信息
-//    private void showResponse(final String response){
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //在这里进行UI操作，将结果显示到界面上
-//                responseText.setTextColor(Color.RED);
-//                responseText.setText(response);
-//            }
-//        });
-//    }
 
 
 }

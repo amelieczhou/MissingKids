@@ -13,23 +13,26 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:api')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
 
 
-Route::group(['middleware' => ['web']],function(){
-    Route::any(
-        'login', 'UserController@login'
-    );
-    Route::any(
-        'register','UserController@register'
-    );
-});
 
-Route::group(['middleware'=>['web']],function() {
-    Route::any('session1', 'StudentController@session1');
-    Route::any('session2', 'StudentController@session2');
+
+
+Route::group(['middleware'=>['web']], function (){
+    //登陆相关接口
+    Route::post('login', 'UserController@login');
+    Route::post('register','UserController@register');
+
+    //创建表单接口
+    Route::post('create','KidsController@create');
+    Route::post('addDescAndPic','KidsController@addDescAndPic');
+    Route::post('edit','KidsController@edit');
+    Route::get('list','KidsController@list');
+    Route::post('del','KidsController@del');
+    Route::post('getOne','KidsController@getOne');
 });
 
 
