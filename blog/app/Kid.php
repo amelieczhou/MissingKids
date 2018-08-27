@@ -14,4 +14,7 @@ class Kid extends Model
         'name', 'age','sex','parent','parent_tel','missing_time',
     ];
 
+
+
+
 }
