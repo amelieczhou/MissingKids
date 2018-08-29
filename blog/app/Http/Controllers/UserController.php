@@ -39,7 +39,7 @@ class UserController extends Controller {
             return $this->simpleJsonError('账号已经被禁用，请联系系统管理员！');
         }
         session()->put([
-            'admin:id' => $ad_user->id,
+            'user_id' => $ad_user->id,
         ]);
         return $this->simpleJsonSuccess('登陆成功');
     }
@@ -85,5 +85,36 @@ class UserController extends Controller {
 
             return $this->simpleJsonSuccess('注册成功');
         }
+    }
+
+    public function getPosition(Request $request){
+
+        $id = session('user_id');
+//            $id = 67;
+        if(empty($id)){
+            return $this->simpleJsonError('please login first');
+        }
+
+        $time = $request->input('time');
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+//        if(empty($time)){
+//            return $this->simpleJsonError('empty input');
+//        }
+
+        $result = DB::table('user')
+            ->where('id',$id)
+            ->update([
+                'time' => $time,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+            ]);
+
+        if(!$result){
+            return $this->simpleJsonError('insert fail');
+        }
+
+        return $this->simpleJsonSuccess('insert success');
+
     }
 }

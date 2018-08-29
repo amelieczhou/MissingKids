@@ -50,27 +50,26 @@ class KidsController extends Controller
             ->insertGetId($fields);
 
         if(!$id){
-            return $this->simpleJsonError('插入失败,请重试');
+            return $this->simpleJsonError('表单填写失败，请重试');
         }
 
         session()->put([
            'kid_id' =>  $id,
         ]);
-        return $this->simpleJsonSuccess('插入成功',session('kid_id'));
+        return $this->simpleJsonSuccess('表单填写成功');
     }
 
     public function addDescAndPic(Request $request){
         $id = session('kid_id');
         if(empty($id)){
-            return $this->simpleJsonError('please register the page before');
+            return $this->simpleJsonError('请先完成前面表单的填写');
         }
 
         $description = $request->input('description');
         $picture = $request->input('picture');
 
         if(empty($description) || empty($picture)){
-//            return $this->simpleJsonError('照片或描述不能为空');
-            return $this->simpleJsonError('empty');
+            return $this->simpleJsonError('照片或描述不能为空');
         }
 
         $res = DB::table('missingkids')
@@ -81,24 +80,23 @@ class KidsController extends Controller
             ]);
 
         if(!$res){
-            return $this->simpleJsonError('insert fail');
+            return $this->simpleJsonError('填写失败，请重试');
         }
 
-        return $this->simpleJsonSuccess('插入成功');
+        return $this->simpleJsonSuccess('填写成功');
     }
 
     public function addPosition(Request $request){
         $id = session('kid_id');
         if(empty($id)){
-            return $this->simpleJsonError('please register the page before');
+            return $this->simpleJsonError('请先完成前表单的填写');
         }
 
         $longitude = $request->input('longitude');
         $latitude = $request->input('latitude');
 
         if(empty($longitude) || empty($latitude)){
-//            return $this->simpleJsonError('照片或描述不能为空');
-            return $this->simpleJsonError('empty');
+            return $this->simpleJsonError('经纬度不能为空');
         }
 
         $res = DB::table('missingkids')
@@ -109,10 +107,10 @@ class KidsController extends Controller
             ]);
 
         if(!$res){
-            return $this->simpleJsonError('insert fail');
+            return $this->simpleJsonError('位置信息添加失败，请重试');
         }
 
-        return $this->simpleJsonSuccess('插入成功');
+        return $this->simpleJsonSuccess('位置信息添加成功');
     }
 
 
