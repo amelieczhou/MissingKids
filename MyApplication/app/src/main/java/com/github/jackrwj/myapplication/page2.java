@@ -80,8 +80,6 @@ public class page2 extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-//        Intent i = new Intent(page2.this ,page3.class);
-//        startActivity(i);
         sendHttpRequest();
     }
 
@@ -128,10 +126,10 @@ public class page2 extends Activity implements View.OnClickListener {
                             response.append(line);
                         }
                         result = response.toString();
-                        Log.i("abc",result);
+                        Toast.makeText(page2.this,result,Toast.LENGTH_SHORT).show();
                     }else {
                         //请求失败
-                        Log.i("abc","no");
+                        Toast.makeText(page2.this,"no",Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -142,8 +140,8 @@ public class page2 extends Activity implements View.OnClickListener {
 //                        JSONObject jsonObject = new JSONObject(result);
 //                        Boolean status = jsonObject.getBoolean("success");
 //                        if(status){
-//                            Intent i = new Intent(MainActivity.this , page1.class);
-//                            startActivity(i);
+                            Intent i = new Intent(page2.this , page3.class);
+                            startActivity(i);
 //                            Looper.prepare();
 //                            Toast.makeText(MainActivity.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
 //                            Looper.loop();

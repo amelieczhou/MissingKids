@@ -10,6 +10,18 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -17,6 +29,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="a1d8302c62f104d2b2453291f95d3e50"/>
 
         <activity android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat.Light">
@@ -30,14 +45,17 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".page1"></activity>
         <activity android:name=".page2"></activity>
+        <!--<activity android:name=".page3"-->
+            <!--android:background="@android:drawable/edit_text"-->
+            <!--android:textCursorDrawable="@drawable/myedittext">-->
+        <!--</activity>-->
         <activity android:name=".page3"
-            android:background="@android:drawable/edit_text"
-            android:textCursorDrawable="@drawable/myedittext">
-
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PlusImageActivity"></activity>
 
-        <!--解决7.0照相机崩溃问题-->
+
+        <!--解决7.0照相机崩问题-->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -47,6 +65,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <service android:name="com.amap.api.location.APSService"></service>
     </application>
 
 </manifest>

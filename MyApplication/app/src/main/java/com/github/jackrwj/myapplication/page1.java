@@ -64,8 +64,7 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
     public TextInputEditText parent_tel;
 
 
-
-    private Button btnDate, btnTime,btnNext;
+    public Button btnDate,btnTime,btnPosition,btnNext;
     private  RadioGroup  radioGroup=null;
     private  RadioButton  radioButton_boy,radioButton_girl;
     public int y=0,M=0,d=0,h=0,m=0;
@@ -89,7 +88,6 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
         validator = new Validator(this);
         validator.setValidationListener(this);
         initView();
-//        Log.i("abc","asdd");
     }
 
     private void initView() {
@@ -135,7 +133,7 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     public void onDateSet(DatePicker view, int year, int monthOfYear,
                                           int dayOfMonth) {
 
-                        // TODO Auto-generated method stub
+
                         Toast.makeText(page1.this, year+"年"+(monthOfYear+1)+"月"+dayOfMonth+"日", Toast.LENGTH_SHORT).show();
                         y = year;
                         M = monthOfYear + 1;
@@ -151,7 +149,7 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
 
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        // TODO Auto-generated method stub
+
                         Toast.makeText(page1.this, hourOfDay+"时"+minute+"分", Toast.LENGTH_SHORT).show();
                         h = hourOfDay;
                         m = minute;
@@ -163,10 +161,22 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
 
             case R.id.button3:
                 validator.validate();
-//                Log.i("abc","asd");
+                break;
         }
     }
 
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        switch (requestCode) {
+//            case 100:
+//                if (resultCode == RESULT_OK) {
+//                    String returnedData = data.getStringExtra("data_return");
+//                    Toast.makeText(page1.this,returnedData , Toast.LENGTH_SHORT).show();
+//                }
+//                break;
+//            default:
+//        }
+//    }
 
 
     @Override
@@ -191,7 +201,7 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     }).create();
             dialog.show();
         }
-       else  if ((_pressed1 == false) || (_pressed2 == false)) {
+       else if ((_pressed1 == false) || (_pressed2 == false)) {
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle("提示")//设置对话框的标题
                     .setMessage("请选择日期和时间")//设置对话框的内容
@@ -211,14 +221,27 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     }).create();
             dialog.show();
         }
-
-
         else{
-            sendHttpRequest();
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("提示")//设置对话框的标题
+                    .setMessage("确认提交表单吗？此操作不可恢复")//设置对话框的内容
+                    //设置对话框的按钮
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+
+                        }
+                    })
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            sendHttpRequest();
+                        }
+                    }).create();
+            dialog.show();
         }
     }
-
-
 
 
     public void sendHttpRequest(){
@@ -234,14 +257,15 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
         ts = ts/1000;
         res = String.valueOf(ts);
 
+        text_name = kids_name.getText().toString();
+        text_age = kids_age.getText().toString();
+        text_parent = parent.getText().toString();
+        text_parent_tel = parent_tel.getText().toString();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                text_name = kids_name.getText().toString();
-                text_age = kids_age.getText().toString();
-                text_parent = parent.getText().toString();
-                text_parent_tel = parent_tel.getText().toString();
-
+//                String path = "http://10.0.2.2:8000/api/create";
                 String path = "http://132.232.27.134/api/create";
                 try {
                     URL url = new URL(path);
@@ -251,10 +275,11 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
 
                     //数据准备
                     String data = "name="+text_name+"&age="+text_age+"&sex="+sex+"&parent="+text_parent+"&parent_tel=" + text_parent_tel + "&missing_time=" + res;
+//                            + "$longitude=" + page3.longitude + "&latitude=" + page3.latitude;
+                    Log.i("abc",data);
                     //至少要设置的两个请求头
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");
-
 
                     //post的方式提交实际上是留的方式提交给服务器
                     connection.setDoOutput(true);
@@ -265,13 +290,11 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     int responseCode = connection.getResponseCode();
                     if(responseCode ==200){
                         //请求成功
-                        InputStream in = connection.getInputStream();
-
                         cookieString=connection.getHeaderField("Set-Cookie");
                         cookieString = cookieString.substring(0, cookieString.indexOf(";"));
 
-
-                        //下面对获取到的输入流进行读取
+                        InputStream in = connection.getInputStream();
+//                    //下面对获取到的输入流进行读取
                         BufferedReader reader = null;
                         reader = new BufferedReader(new InputStreamReader(in));
                         StringBuilder response = new StringBuilder();
@@ -283,8 +306,7 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                         Log.i("abc",result);
                     }else {
                         //请求失败
-//                        Log.i("abc","请求失败");
-                        Toast ts = Toast.makeText(page1.this,"post请求，请重试!", Toast.LENGTH_LONG);
+                        Log.i("abc","no");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -295,11 +317,8 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){
-                            Intent i = new Intent(page1.this , page2.class);
-//                            Bundle bundle = new Bundle();
-//                            bundle.putString("cookie",cookieString);
-//                            i.putExtras(bundle);
-                             startActivity(i);
+                            Intent i = new Intent(page1.this , page3.class);
+                            startActivity(i);
                             Looper.prepare();
                             Toast.makeText(page1.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
                             Looper.loop();
@@ -312,9 +331,11 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     catch (Exception e) {
                         e.printStackTrace();
                     }
+
                 }
             }
         }).start();
+
     }
 
 
