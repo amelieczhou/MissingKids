@@ -26,6 +26,10 @@ Route::group(['middleware'=>['web']], function (){
     Route::post('login', 'UserController@login');
     Route::post('register','UserController@register');
 
+
+    //获取用户实时位置信息
+    Route::post('position','UserController@getPosition');
+
     //创建表单接口
     Route::post('create','KidsController@create');
     Route::post('addDescAndPic','KidsController@addDescAndPic');

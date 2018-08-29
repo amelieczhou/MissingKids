@@ -9,20 +9,33 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                GETUI_APP_ID : "OfJuoh1kaZ9sFAf9XoR5W2",
+                GETUI_APP_KEY : "HF7ylLasAE8vnFjWWcGkN3",
+                GETUI_APP_SECRET : "Wk4oRhNxvI8ScCV5kXdaM3"
+        ]
+
         ndk { //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
-             abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86","arm64-v8a","x86_64"
+             abiFilters "armeabi", "armeabi-v7a","x86_64"
             }
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
+//    sourceSets {
+//        main {
+//            jniLibs.srcDirs = ['libs']
+//        }
+//    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
 }
 
@@ -41,10 +54,13 @@ dependencies {
     implementation 'com.android.support:design:28.0.0-beta01'
     implementation 'fr.matthieu-vergne:ioutils:1.0'
     implementation 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
-
     implementation 'com.amap.api:3dmap:latest.integration'
     implementation 'com.amap.api:map2d:latest.integration'
     implementation 'com.amap.api:search:latest.integration'
     implementation 'com.amap.api:location:latest.integration'
+    //    implementation 'com.amap.api:ContinueLocation:latest.integration'
     testImplementation 'junit:junit:4.12'
+
+    implementation 'com.getui:sdk:2.12.4.0'
+    implementation 'com.android.support:support-v4:23.0.0'
 }

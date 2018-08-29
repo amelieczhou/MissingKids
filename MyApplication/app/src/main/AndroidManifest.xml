@@ -22,6 +22,14 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
+    <!-- 支持iBeancon 需要蓝牙权限 -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <!-- 支持个推3.0 电子围栏功能 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -53,7 +61,14 @@
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PlusImageActivity"></activity>
-
+        <activity android:name=".ContinueLocation"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".GetuiSdkDemoActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
+        </activity>
 
         <!--解决7.0照相机崩问题-->
         <provider
@@ -66,6 +81,18 @@
                 android:resource="@xml/file_paths" />
         </provider>
         <service android:name="com.amap.api.location.APSService"></service>
+
+        <!-- 用户自定义服务继承自GTIntentService,作为SDK与APP桥梁服务,用来接收各种消息和命令回复-->
+        <service android:name=".DemoIntentService"/>
+
+        <!-- 配置SDK核心服务 -->
+        <service
+            android:name=".DemoPushService"
+            android:exported="true"
+            android:label="PushService"
+            android:process=":pushservice">
+        </service>
+
     </application>
 
 </manifest>
