@@ -29,10 +29,12 @@ Route::group(['middleware'=>['web']], function (){
     //创建表单接口
     Route::post('create','KidsController@create');
     Route::post('addDescAndPic','KidsController@addDescAndPic');
+    Route::post('addPosition','KidsController@addPosition');
     Route::post('edit','KidsController@edit');
     Route::get('list','KidsController@list');
     Route::post('del','KidsController@del');
     Route::post('getOne','KidsController@getOne');
+
 });
 
 

@@ -15,6 +15,8 @@ class KidsController extends Controller
         $parent = $request->parent;
         $parent_tel = $request->parent_tel;
         $missing_time = $request->missing_time;
+        $longitude = $request->longitude;
+        $latitude = $request->latitude;
 
 
         $res = DB::table('missingkids')
@@ -36,6 +38,8 @@ class KidsController extends Controller
             'parent' => $parent,
             'parent_tel' => $parent_tel,
             'missing_time' => $missing_time,
+            'missing_longitude' => $longitude,
+            'missing_latitude' => $latitude,
             'created_at' => time(),
             'updated_at' => time(),
             'state' => 1,
@@ -77,15 +81,38 @@ class KidsController extends Controller
             ]);
 
         if(!$res){
-//            return $this->simpleJsonError('插入内容与原内容重复');
-            return $this->simpleJsonError('content the same',session('kid_id'));
+            return $this->simpleJsonError('insert fail');
         }
 
         return $this->simpleJsonSuccess('插入成功');
     }
 
-    public function edit(Request $request){
+    public function addPosition(Request $request){
+        $id = session('kid_id');
+        if(empty($id)){
+            return $this->simpleJsonError('please register the page before');
+        }
 
+        $longitude = $request->input('longitude');
+        $latitude = $request->input('latitude');
+
+        if(empty($longitude) || empty($latitude)){
+//            return $this->simpleJsonError('照片或描述不能为空');
+            return $this->simpleJsonError('empty');
+        }
+
+        $res = DB::table('missingkids')
+            ->where('id',$id)
+            ->update([
+                'missing_longitude' => $longitude,
+                'missing_latitude' => $latitude,
+            ]);
+
+        if(!$res){
+            return $this->simpleJsonError('insert fail');
+        }
+
+        return $this->simpleJsonSuccess('插入成功');
     }
 
 
@@ -96,6 +123,10 @@ class KidsController extends Controller
             ->paginate(15)
             ->toArray();
         return $this->simpleJsonSuccess($data);
+    }
+
+    public function edit(){
+
     }
 
 
