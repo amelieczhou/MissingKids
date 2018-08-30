@@ -53,22 +53,60 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".page1"></activity>
         <activity android:name=".page2"></activity>
-        <!--<activity android:name=".page3"-->
-            <!--android:background="@android:drawable/edit_text"-->
-            <!--android:textCursorDrawable="@drawable/myedittext">-->
-        <!--</activity>-->
         <activity android:name=".page3"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PlusImageActivity"></activity>
-        <activity android:name=".ContinueLocation"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:name=".GetuiSdkDemoActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop">
-        </activity>
+
+
+        <!-- push service start -->
+        <!-- 用于接收系统消息以保证PushService正常运行 -->
+        <receiver android:name="com.github.jackrwj.myapplication.PushServiceReceiver"
+            android:process=":bdservice_v1" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="com.baidu.android.pushservice.action.notification.SHOW" />
+                <action android:name="com.baidu.android.pushservice.action.media.CLICK" />
+                <!-- 以下四项为可选的action声明，可大大提高service存活率和消息到达速度 -->
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+        <!-- Push服务接收客户端发送的各种请求-->
+        <receiver android:name="com.github.jackrwj.myapplication.RegistrationReceiver"
+            android:process=":bdservice_v1" >
+            <intent-filter>
+                <action android:name="com.baidu.android.pushservice.action.METHOD" />
+                <action android:name="com.baidu.android.pushservice.action.BIND_SYNC" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+        <service android:name="com.github.jackrwj.myapplication.PushService" android:exported="true"
+            android:process=":bdservice_v1" >
+            <intent-filter >
+                <action android:name="com.baidu.android.pushservice.action.PUSH_SERVICE" />
+            </intent-filter>
+        </service>
+
+        <!-- 4.4版本新增的CommandService声明，提升小米和魅族手机上的实际推送到达率 -->
+        <service android:name="com.github.jackrwj.myapplication.CommandService"
+            android:exported="true" />
+
+        <!-- 适配Android N系统必需的ContentProvider声明，写权限包含应用包名-->
+        <provider
+            android:name="com.github.jackrwj.myapplication.PushInfoProvider"
+            android:authorities="YourPackageName.bdpush"
+            android:writePermission="baidu.push.permission.WRITE_PUSHINFOPROVIDER.YourPackageName"
+            android:protectionLevel = "signature"
+            android:exported="true" />
+
+        <!-- push结束 -->
 
         <!--解决7.0照相机崩问题-->
         <provider
@@ -82,17 +120,34 @@
         </provider>
         <service android:name="com.amap.api.location.APSService"></service>
 
-        <!-- 用户自定义服务继承自GTIntentService,作为SDK与APP桥梁服务,用来接收各种消息和命令回复-->
-        <service android:name=".DemoIntentService"/>
 
-        <!-- 配置SDK核心服务 -->
-        <service
-            android:name=".DemoPushService"
-            android:exported="true"
-            android:label="PushService"
-            android:process=":pushservice">
-        </service>
 
     </application>
+
+
+    <!-- Push service 运行需要的权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 富媒体需要声明的权限 -->
+    <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+
+    <!-- 适配Android N系统必需的ContentProvider写权限声明，写权限包含应用包名-->
+    <uses-permission android:name="baidu.push.permission.WRITE_PUSHINFOPROVIDER.com.github.jackrwj.myapplication" />
+    <permission
+        android:name="baidu.push.permission.WRITE_PUSHINFOPROVIDER.com.github.jackrwj.myapplication"
+        android:protectionLevel="signature">
+    </permission>
+
+
 
 </manifest>

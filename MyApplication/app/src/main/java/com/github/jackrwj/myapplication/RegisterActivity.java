@@ -23,12 +23,12 @@ import com.mobsandgeeks.saripaar.annotation.Pattern;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 
 public class RegisterActivity extends Activity implements Validator.ValidationListener,View.OnClickListener {
@@ -46,7 +46,7 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
     @Order(3)
     public EditText et_confirm_pwd;
 
-    @Pattern(regex = "^\\d{11}$",messageResId=R.string.tel_hint)
+    @Pattern(regex =  "^\\d{8,11}$",messageResId=R.string.tel_hint)
     @Order(4)
     public EditText et_tel;
 
@@ -87,42 +87,34 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
 
     @Override
     public void onValidationSucceeded() {
-        //TODO:验证成功之后的逻辑处理
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 text_name = et_name.getText().toString();
+                text_name = URLEncoder.encode(text_name);
                 text_pwd = et_pwd.getText().toString();
                 text_tel = et_tel.getText().toString();
                 text_email = et_email.getText().toString();
 
-                String path = "http://10.0.2.2:8000/api/register";
+//                String path = "http://10.0.2.2:8000/api/register";
+                String path = "http://132.232.27.134/api/register";
                 try {
                     URL url = new URL(path);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setRequestMethod("POST");
 
-                    //数据准备
                     String data = "name="+text_name+"&password="+text_pwd+"&email="+text_email+"&tel="+text_tel;
-                    //至少要设置的两个请求头
+
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");
-
-
-                    //post的方式提交实际上是留的方式提交给服务器
-                    connection.setDoOutput(true);
                     OutputStream outputStream = connection.getOutputStream();
+                    Log.i("abc",data);
                     outputStream.write(data.getBytes());
 
-                    //获得结果码
                     int responseCode = connection.getResponseCode();
                     if(responseCode ==200){
-                        //请求成功
-//                        InputStream is = connection.getInputStream();
                         InputStream in = connection.getInputStream();
-//                    //下面对获取到的输入流进行读取
                         BufferedReader reader = null;
                         reader = new BufferedReader(new InputStreamReader(in));
                         StringBuilder response = new StringBuilder();
@@ -133,16 +125,12 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
                         result = response.toString();
                         Log.i("abc",result);
                     }else {
-                        //请求失败
                         Log.i("abc","no");
-                        Toast ts = Toast.makeText(RegisterActivity.this,"post请求，请重试!", Toast.LENGTH_LONG);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }finally {
-                    //发送完成后的操作
                     try {
-                        //第一步，生成Json字符串格式的JSON对象
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){
@@ -160,7 +148,6 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
                     catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
             }
         }).start();
@@ -178,10 +165,9 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);
             } else {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
     @Override
