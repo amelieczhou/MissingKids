@@ -16,8 +16,8 @@ import android.widget.Toast;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.entity.LocalMedia;
-import com.mobsandgeeks.saripaar.Validator;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,77 +85,66 @@ public class page2 extends Activity implements View.OnClickListener {
     }
 
     public void  sendHttpRequest(){
-        //开启线程来发起网络请求
         new Thread(new Runnable() {
             @Override
             public void run() {
-//                Intent intent = getIntent();
-//                String cookie = intent.getStringExtra("cookie");
                 String cookie = page1.cookieString;
-//                Log.i("abc",cookie);
                 String text = et_input.getText().toString();
+                text = URLEncoder.encode(text);
+//               String path = "http://10.0.2.2:8000/api/addDescAndPic";
                 String path = "http://132.232.27.134/api/addDescAndPic";
-                try {
 
+                try {
                     URL url = new URL(path);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setRequestMethod("POST");
-                    //数据准备
+
                     String data = "description=" + text + "&picture=" + "44444";
-                    //至少要设置的两个请求头
-                    connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-                    connection.setRequestProperty("Content-Length", data.length()+"");
+
+                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    connection.setRequestProperty("Content-Length", data.length() + "");
                     connection.setRequestProperty("Cookie", cookie);
-
-
-//                    Log.i("abc",data);
                     OutputStream outputStream = connection.getOutputStream();
                     outputStream.write(data.getBytes());
 
-                    //获得结果码
                     int responseCode = connection.getResponseCode();
-                    if(responseCode ==200){
-                        //请求成功
+                    if (responseCode == 200) {
                         InputStream in = connection.getInputStream();
-//                    //下面对获取到的输入流进行读取
                         BufferedReader reader = null;
                         reader = new BufferedReader(new InputStreamReader(in));
                         StringBuilder response = new StringBuilder();
                         String line;
-                        while ((line = reader.readLine()) != null){
+                        while ((line = reader.readLine()) != null) {
                             response.append(line);
                         }
                         result = response.toString();
-                        Toast.makeText(page2.this,result,Toast.LENGTH_SHORT).show();
-                    }else {
-                        //请求失败
-                        Toast.makeText(page2.this,"no",Toast.LENGTH_SHORT).show();
+                        Log.i("abc", result);
+                    } else {
+                        Toast.makeText(page2.this, "no", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     //发送完成后的操作
                     try {
                         //第一步，生成Json字符串格式的JSON对象
-//                        JSONObject jsonObject = new JSONObject(result);
-//                        Boolean status = jsonObject.getBoolean("success");
-//                        if(status){
-                            Intent i = new Intent(page2.this , page3.class);
+                        JSONObject jsonObject = new JSONObject(result);
+                        Boolean status = jsonObject.getBoolean("success");
+                        if (status) {
+                            Intent i = new Intent(page2.this, page3.class);
                             startActivity(i);
-//                            Looper.prepare();
-//                            Toast.makeText(MainActivity.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
-//                            Looper.loop();
-//                        }else{
-//                            Looper.prepare();
-//                            Toast.makeText(MainActivity.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
-//                            Looper.loop();
-//                        }
-                    }
-                    catch (Exception e) {
+                            Looper.prepare();
+                            Toast.makeText(page2.this, jsonObject.getString("data"), Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        } else {
+                            Looper.prepare();
+                            Toast.makeText(page2.this, jsonObject.getString("data"), Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
             }
         }).start();

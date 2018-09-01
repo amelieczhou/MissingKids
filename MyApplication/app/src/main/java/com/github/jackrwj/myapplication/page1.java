@@ -38,13 +38,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 public class page1 extends Activity implements View.OnClickListener ,Validator.ValidationListener{
-
     @NotEmpty(messageResId=R.string.name_hint)
     @Length(min=2,max=20, messageResId=R.string.name_length_hint)
     @Order(1)
@@ -132,8 +132,6 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear,
                                           int dayOfMonth) {
-
-
                         Toast.makeText(page1.this, year+"年"+(monthOfYear+1)+"月"+dayOfMonth+"日", Toast.LENGTH_SHORT).show();
                         y = year;
                         M = monthOfYear + 1;
@@ -165,19 +163,6 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
         }
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        switch (requestCode) {
-//            case 100:
-//                if (resultCode == RESULT_OK) {
-//                    String returnedData = data.getStringExtra("data_return");
-//                    Toast.makeText(page1.this,returnedData , Toast.LENGTH_SHORT).show();
-//                }
-//                break;
-//            default:
-//        }
-//    }
-
 
     @Override
     public void onValidationSucceeded() {
@@ -201,10 +186,30 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     }).create();
             dialog.show();
         }
-       else if ((_pressed1 == false) || (_pressed2 == false)) {
+       else if (_pressed1 == false) {
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle("提示")//设置对话框的标题
-                    .setMessage("请选择日期和时间")//设置对话框的内容
+                    .setMessage("日期未选择")//设置对话框的内容
+                    //设置对话框的按钮
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+
+                        }
+                    })
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create();
+            dialog.show();
+        }
+        else if (_pressed2 == false) {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("提示")//设置对话框的标题
+                    .setMessage("时间未选择")//设置对话框的内容
                     //设置对话框的按钮
                     .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                         @Override
@@ -243,7 +248,6 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
         }
     }
 
-
     public void sendHttpRequest(){
         String  s= String.format("%04d-%02d-%02d %02d:%02d:%02d",y,M,d,h,m,0);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -258,8 +262,10 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
         res = String.valueOf(ts);
 
         text_name = kids_name.getText().toString();
+        text_name = URLEncoder.encode(text_name);
         text_age = kids_age.getText().toString();
         text_parent = parent.getText().toString();
+        text_parent = URLEncoder.encode(text_parent);
         text_parent_tel = parent_tel.getText().toString();
 
         new Thread(new Runnable() {
@@ -273,28 +279,20 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                     connection.setConnectTimeout(5000);
                     connection.setRequestMethod("POST");
 
-                    //数据准备
                     String data = "name="+text_name+"&age="+text_age+"&sex="+sex+"&parent="+text_parent+"&parent_tel=" + text_parent_tel + "&missing_time=" + res;
-//                            + "$longitude=" + page3.longitude + "&latitude=" + page3.latitude;
-                    Log.i("abc",data);
-                    //至少要设置的两个请求头
+
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");
-
-                    //post的方式提交实际上是留的方式提交给服务器
                     connection.setDoOutput(true);
                     OutputStream outputStream = connection.getOutputStream();
                     outputStream.write(data.getBytes());
 
-                    //获得结果码
                     int responseCode = connection.getResponseCode();
                     if(responseCode ==200){
-                        //请求成功
                         cookieString=connection.getHeaderField("Set-Cookie");
                         cookieString = cookieString.substring(0, cookieString.indexOf(";"));
 
                         InputStream in = connection.getInputStream();
-//                    //下面对获取到的输入流进行读取
                         BufferedReader reader = null;
                         reader = new BufferedReader(new InputStreamReader(in));
                         StringBuilder response = new StringBuilder();
@@ -305,7 +303,6 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                         result = response.toString();
                         Log.i("abc",result);
                     }else {
-                        //请求失败
                         Log.i("abc","no");
                     }
                 } catch (Exception e) {
@@ -338,7 +335,6 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
 
     }
 
-
     /***
      * 验证失败的处理
      */
@@ -353,10 +349,5 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
-
     }
-
-
-
-
 }

@@ -12,13 +12,6 @@ import java.util.List;
 
 import uk.co.senab.photoview.PhotoView;
 
-/**
- * 图片浏览的适配器
- * <p>
- * 作者： 周旭 on 2017年7月30日 0030.
- * 邮箱：374952705@qq.com
- * 博客：http://www.jianshu.com/u/56db5d78044d
- */
 
 public class ViewPagerAdapter extends PagerAdapter {
 

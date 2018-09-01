@@ -10,15 +10,10 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders = [
-                GETUI_APP_ID : "OfJuoh1kaZ9sFAf9XoR5W2",
-                GETUI_APP_KEY : "HF7ylLasAE8vnFjWWcGkN3",
-                GETUI_APP_SECRET : "Wk4oRhNxvI8ScCV5kXdaM3"
-        ]
-
-        ndk { //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
-             abiFilters "armeabi", "armeabi-v7a","x86_64"
-            }
+        ndk {
+            //根据需要 自行选择添加的对应cpu类型的.so库。
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a','x86', 'x86_64', 'mips', 'mips64'
+        }
     }
     buildTypes {
         release {

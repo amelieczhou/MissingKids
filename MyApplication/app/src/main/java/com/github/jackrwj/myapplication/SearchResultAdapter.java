@@ -13,17 +13,7 @@ import com.amap.api.services.core.PoiItem;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 包名： com.amap.searchdemo
- * <p>
- * 创建时间：2016/10/19
- * 项目名称：SearchDemo
- *
- * @author guibao.ggb
- * @email guibao.ggb@alibaba-inc.com
- * <p>
- * 类说明：
- */
+
 public class SearchResultAdapter extends BaseAdapter {
 
     private List<PoiItem> data;

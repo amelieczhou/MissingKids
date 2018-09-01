@@ -67,7 +67,6 @@ import java.util.List;
 public class page3 extends AppCompatActivity implements LocationSource,
         AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener,View.OnClickListener, PoiSearch.OnPoiSearchListener { // Inputtips.InputtipsListener
 
-
     private ListView listView;
     private SegmentedGroup mSegmentedGroup;
     private AutoCompleteTextView searchText;
@@ -78,9 +77,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
     private AMapLocationClientOption mLocationOption;
 
     private String[] items = {"住宅区", "学校", "楼宇", "商场" };
-
     private Marker locationMarker;
-
     private ProgressDialog progDialog = null;
     private GeocodeSearch geocoderSearch;
 
@@ -95,9 +92,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
 
 
     private List<PoiItem> resultData;
-
     private SearchResultAdapter searchResultAdapter;
-
     private boolean isItemClickAction;
 
     private List<Tip> autoTips;
@@ -145,7 +140,6 @@ public class page3 extends AppCompatActivity implements LocationSource,
         listView = (ListView) findViewById(R.id.listview);
         searchResultAdapter = new SearchResultAdapter(page3.this);
         listView.setAdapter(searchResultAdapter);
-
         listView.setOnItemClickListener(onItemClickListener);
 
         mSegmentedGroup = (SegmentedGroup) findViewById(R.id.segmented_group);
@@ -175,7 +169,6 @@ public class page3 extends AppCompatActivity implements LocationSource,
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -189,10 +182,8 @@ public class page3 extends AppCompatActivity implements LocationSource,
                     inputTips.requestInputtipsAsyn();
                 }
             }
-
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
 
@@ -236,7 +227,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
                     startJumpAnimation();
                 }
                 searchLatlonPoint = new LatLonPoint(cameraPosition.target.latitude, cameraPosition.target.longitude);
-               //-------------------------------------------------------------------------
+               //位置信息变化时的动作
                 isInputKeySearch = false;
                 isItemClickAction = false;
             }
@@ -473,9 +464,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
                 LatLng curLatlng = new LatLng(poiItem.getLatLonPoint().getLatitude(), poiItem.getLatLonPoint().getLongitude());
 
                 isItemClickAction = true;
-
                 aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatlng, 16f));
-
                 searchResultAdapter.setSelectedPosition(position);
                 searchResultAdapter.notifyDataSetChanged();
             }
@@ -619,22 +608,19 @@ public class page3 extends AppCompatActivity implements LocationSource,
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setRequestMethod("POST");
-                    //数据准备
+
                     String data = "longitude=" + searchLatlonPoint.getLongitude() + "&latitude=" + searchLatlonPoint.getLatitude();
-                    //至少要设置的两个请求头
+
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");
                     connection.setRequestProperty("Cookie", cookie);
-
                     OutputStream outputStream = connection.getOutputStream();
                     outputStream.write(data.getBytes());
 
-                    //获得结果码
+
                     int responseCode = connection.getResponseCode();
                     if(responseCode ==200){
-                        //请求成功
                         InputStream in = connection.getInputStream();
-//                    //下面对获取到的输入流进行读取
                         BufferedReader reader = null;
                         reader = new BufferedReader(new InputStreamReader(in));
                         StringBuilder response = new StringBuilder();
@@ -643,10 +629,9 @@ public class page3 extends AppCompatActivity implements LocationSource,
                             response.append(line);
                         }
                         result = response.toString();
-                        Toast.makeText(page3.this,result,Toast.LENGTH_SHORT).show();
+                        Log.i("abc",result);
                     }else {
-                        //请求失败
-                        Toast.makeText(page3.this,"no",Toast.LENGTH_SHORT).show();
+                        Log.i("abc","no");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -658,11 +643,8 @@ public class page3 extends AppCompatActivity implements LocationSource,
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){
-
-
-                        Intent i = new Intent(page3.this , page2.class);
-                        startActivity(i);
-
+                            Intent i = new Intent(page3.this , page2.class);
+                            startActivity(i);
                             Looper.prepare();
                             Toast.makeText(page3.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
                             Looper.loop();
@@ -675,7 +657,6 @@ public class page3 extends AppCompatActivity implements LocationSource,
                     catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
             }
         }).start();
