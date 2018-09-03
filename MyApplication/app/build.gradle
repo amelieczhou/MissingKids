@@ -51,5 +51,4 @@ dependencies {
     implementation 'com.amap.api:location:latest.integration'
     //    implementation 'com.amap.api:ContinueLocation:latest.integration'
     testImplementation 'junit:junit:4.12'
-
 }

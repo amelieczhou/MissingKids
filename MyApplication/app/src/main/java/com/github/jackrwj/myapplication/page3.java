@@ -601,7 +601,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
             @Override
             public void run() {
                 String cookie = page1.cookieString;
-//                String path = "http://localhost:8000/api/addPosition";
+//                String path = "http://10.0.2.2:8000/api/addPosition";
                 String path = "http://132.232.27.134/api/addPosition";
                 try {
                     URL url = new URL(path);
@@ -643,7 +643,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){
-                            Intent i = new Intent(page3.this , page2.class);
+                            Intent i = new Intent(page3.this , page4.class);
                             startActivity(i);
                             Looper.prepare();
                             Toast.makeText(page3.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();

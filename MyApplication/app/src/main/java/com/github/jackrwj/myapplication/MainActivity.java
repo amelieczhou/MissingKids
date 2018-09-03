@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
     @Email(messageResId =R.string.email_hint)
     @Order(1)
     protected EditText et_email;
-    @Password(min=6, scheme=Password.Scheme.ANY, messageResId =R.string.pwd_hint)
+    @Password(min =6, scheme = Password.Scheme.ANY,messageResId =R.string.pwd_hint)
     @Order(2)
 
     protected EditText et_pwd;
@@ -50,13 +50,13 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
     public AMapLocation pub_location;
     private int continueCount;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         et_email = findViewById(R.id.email_edit);
         et_pwd = findViewById(R.id.password_edit);
+//        responseText = findViewById(R.id.response);
         btn_login = findViewById(R.id.login);
         btn_register = findViewById(R.id.register);
 
@@ -66,9 +66,10 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
         validator = new Validator(this);
         validator.setValidationListener(this);
 
+//        PushManager.getInstance().registerPushIntentService(this.getApplicationContext(), DemoIntentService.class);
+
+
     }
-
-
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.login){
@@ -81,26 +82,30 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
 
 
     public void  sendHttpRequest(){
+        //开启线程来发起网络请求
         new Thread(new Runnable() {
             @Override
             public void run() {
 
-//                String path = "http://10.0.2.2:8000/api/login";
-                String path = "http://132.232.27.134/api/login";
-
                 text_email = et_email.getText().toString();
                 text_pwd = et_pwd.getText().toString();
+                String path = "http://132.232.27.134/api/login";
+//                String path = "http://10.0.2.2:8000/api/login";
                 try {
                     URL url = new URL(path);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setRequestMethod("POST");
 
+                    //数据准备
                     String data = "email="+text_email+"&password="+text_pwd;
-
+                    //至少要设置的两个请求头
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");
 
+
+
+                    //post的方式提交实际上是留的方式提交给服务器
                     connection.setDoOutput(true);
                     OutputStream outputStream = connection.getOutputStream();
                     outputStream.write(data.getBytes());
@@ -108,10 +113,12 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
                     //获得结果码
                     int responseCode = connection.getResponseCode();
                     if(responseCode ==200){
+
                         cookieString=connection.getHeaderField("Set-Cookie");
                         cookieString = cookieString.substring(0, cookieString.indexOf(";"));
 
                         InputStream in = connection.getInputStream();
+//                    //下面对获取到的输入流进行读取
                         BufferedReader reader = null;
                         reader = new BufferedReader(new InputStreamReader(in));
                         StringBuilder response = new StringBuilder();
@@ -134,6 +141,8 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){
+//                            Intent i = new Intent(MainActivity.this , ContinueLocation.class);
+//                            startActivity(i);
                             startContinueLocation();
                             sendHttpRequest2();
                             Looper.prepare();
@@ -148,9 +157,11 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
                     catch (Exception e) {
                         e.printStackTrace();
                     }
+
                 }
             }
         }).start();
+
     }
 
     /**
@@ -173,6 +184,8 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
             Intent i = new Intent(MainActivity.this,page1.class);
             startActivity(i);
         }
+
+
     }
 
     /**
@@ -194,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
 //            }
 //            tvResultContinue.setText(sb.toString());
             pub_location = location;
+
             sendHttpRequest2();
         }
     };
@@ -202,10 +216,10 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
         new Thread(new Runnable() {
             @Override
             public void run() {
+                String cookie = MainActivity.cookieString;
+//                String path = "http://10.0.2.2:8000/api/position";
+                String path = "http://132.232.27.134/api/position";
                 try {
-//                    String path = "http://10.0.2.2:8000/api/position";
-                    String path = "http://132.232.27.134/api/position";
-
                     URL url = new URL(path);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
@@ -217,18 +231,22 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
                     //至少要设置的两个请求头
                     connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length() + "");
-                    connection.setRequestProperty("Cookie", cookieString);
+                    connection.setRequestProperty("Cookie", cookie);
 
                     //post的方式提交实际上是留的方式提交给服务器
                     connection.setDoOutput(true);
                     OutputStream outputStream = connection.getOutputStream();
                     outputStream.write(data.getBytes());
 
-//实时更新消耗大，不打印
-//                    //获得结果码
-//                    int responseCode = connection.getResponseCode();
-//                    if (responseCode == 200) {
+                    //获得结果码
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode == 200) {
+                        //请求成功
+//                        cookieString = connection.getHeaderField("Set-Cookie");
+//                        cookieString = cookieString.substring(0, cookieString.indexOf(";"));
+
 //                        InputStream in = connection.getInputStream();
+////                    //下面对获取到的输入流进行读取
 //                        BufferedReader reader = null;
 //                        reader = new BufferedReader(new InputStreamReader(in));
 //                        StringBuilder response = new StringBuilder();
@@ -237,13 +255,36 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
 //                            response.append(line);
 //                        }
 //                        result = response.toString();
-//                        Log.i("abc",result);
-//                    } else {
-//                        //请求失败
-//                        Log.i("abc", "no");
-//                    }
+//                        Log.i("abc", result);
+                        Log.i("abc", "ok");
+                    } else {
+                        //请求失败
+                        Log.i("abc", "no");
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+
+//                    Toast.makeText(MainActivity.this,"success",Toast.LENGTH_SHORT).show();
+//                    //发送完成后的操作
+//                    try {
+//                        //第一步，生成Json字符串格式的JSON对象
+//                        JSONObject jsonObject = new JSONObject(result);
+//                        Boolean status = jsonObject.getBoolean("success");
+//                        if (status) {
+//                            Intent i = new Intent(page1.this, page3.class);
+//                            startActivity(i);
+//                            Looper.prepare();
+//                            Toast.makeText(page1.this, jsonObject.getString("data"), Toast.LENGTH_SHORT).show();
+//                            Looper.loop();
+//                        } else {
+//                            Looper.prepare();
+//                            Toast.makeText(page1.this, jsonObject.getString("data"), Toast.LENGTH_SHORT).show();
+//                            Looper.loop();
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         }).start();
