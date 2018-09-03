@@ -30,7 +30,7 @@ Route::group(['middleware'=>['web']], function (){
     //获取用户实时位置信息
     Route::post('position','UserController@getPosition');
 
-    //创建表单接口
+    //丢失儿童信息
     Route::post('create','KidsController@create');
     Route::post('addDescAndPic','KidsController@addDescAndPic');
     Route::post('addPosition','KidsController@addPosition');
@@ -38,6 +38,7 @@ Route::group(['middleware'=>['web']], function (){
     Route::get('list','KidsController@list');
     Route::post('del','KidsController@del');
     Route::post('getOne','KidsController@getOne');
+    Route::get('getAllPosition','KidsController@getAllPosition');
 
 });
 

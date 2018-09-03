@@ -132,6 +132,15 @@ class KidsController extends Controller
 
     }
 
+    public function getAllPosition(){
+        $data = DB::table('missingkids')
+            ->select('missing_longitude','missing_latitude')
+            ->get();
+
+
+        return $this->simpleJsonSuccess($data);
+    }
+
     public function getOne(Request $request){
         $id = $request->input('id');
         if(!$this->isId($id)){
@@ -151,7 +160,6 @@ class KidsController extends Controller
         }
 
         return $this->simpleJsonSuccess($data);
-
 
     }
 }
