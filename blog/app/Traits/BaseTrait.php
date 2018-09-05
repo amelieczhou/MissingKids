@@ -19,7 +19,7 @@ trait BaseTrait{
 
     public function getLoginState()
     {
-        if(session()->has('admin:id')){
+        if(session()->has('user_id')){
             return true;
 //            $old_ip = session()->get('admin:ip');
 //            if(!empty($old_ip) && $old_ip == $ip){

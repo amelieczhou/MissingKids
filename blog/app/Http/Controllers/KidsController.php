@@ -152,7 +152,7 @@ class KidsController extends Controller
                 ['id',$id],
                 ['state',1]
             ])
-            ->select('id','name','age','sex','parent','parent_tel','missing_time','description','picture')
+            ->select('name','age','sex','parent','parent_tel','missing_time','place','description')
             ->first();
 
         if(empty($data)){
@@ -163,14 +163,14 @@ class KidsController extends Controller
 
     }
 
-    public function getInfo(){
+    public function getAllInfo(){
         $data = DB::table('missingkids')
-            ->select('missing_longitude','missing_latitude')
+            ->select('id','name','age','sex','parent_tel')
             ->get();
         return $this->simpleJsonSuccess($data);
-
-
     }
+
+
 
 
 
