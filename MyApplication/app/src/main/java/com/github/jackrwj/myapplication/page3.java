@@ -598,10 +598,12 @@ public class page3 extends AppCompatActivity implements LocationSource,
 
     @Override
     public void onClick(View view) {
+//        Toast.makeText(page3.this, place, Toast.LENGTH_SHORT).show();
         sendHttpRequest();
     }
 
     public void  sendHttpRequest(){
+
         //开启线程来发起网络请求
         new Thread(new Runnable() {
             @Override
@@ -611,13 +613,15 @@ public class page3 extends AppCompatActivity implements LocationSource,
                 String path = "http://132.232.27.134/api/addPosition";
                 try {
                     URL url = new URL(path);
+
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
                     connection.setConnectTimeout(5000);
                     connection.setRequestMethod("POST");
-                    Log.i("abc",place);
 
-                    place = URLEncoder.encode(place);
-                    String data = "longitude=" + searchLatlonPoint.getLongitude() + "&latitude=" + searchLatlonPoint.getLatitude() + "$place=" + place;
+                    Log.i("abc",place);
+                    String text_place = URLEncoder.encode(place);
+                    String data = "longitude=" + searchLatlonPoint.getLongitude() + "&latitude=" + searchLatlonPoint.getLatitude() + "&place=" + text_place;
 
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");

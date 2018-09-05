@@ -70,6 +70,7 @@
         </activity>
         <activity android:name=".PlusImageActivity"></activity>
         <activity android:name=".page4"></activity>
+        <activity android:name=".page5"></activity>
 
         <!--解决7.0照相机崩问题-->
         <provider

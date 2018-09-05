@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
         if(view.getId() == R.id.login){
             validator.validate();
         }else{
-            Intent i = new Intent(MainActivity.this ,RegisterActivity.class);
+            Intent i = new Intent(MainActivity.this ,page5.class);
             startActivity(i);
         }
     }
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
 //                        }
 //                        result = response.toString();
 //                        Log.i("abc", result);
-                        Log.i("abc", "ok");
+//                        Log.i("abc", "ok");
                     } else {
                         //请求失败
                         Log.i("abc", "no");
