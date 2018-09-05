@@ -61,6 +61,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,6 +101,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
     private PoiItem firstItem;
     protected Button button;
     public String result;
+    public String place;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -465,6 +467,10 @@ public class page3 extends AppCompatActivity implements LocationSource,
 
                 isItemClickAction = true;
                 aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatlng, 16f));
+
+                place = poiItem.getCityName() + poiItem.getAdName() + poiItem.getSnippet();//=====================================
+                Toast.makeText(page3.this, place, Toast.LENGTH_SHORT).show();
+
                 searchResultAdapter.setSelectedPosition(position);
                 searchResultAdapter.notifyDataSetChanged();
             }
@@ -608,8 +614,10 @@ public class page3 extends AppCompatActivity implements LocationSource,
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(5000);
                     connection.setRequestMethod("POST");
+                    Log.i("abc",place);
 
-                    String data = "longitude=" + searchLatlonPoint.getLongitude() + "&latitude=" + searchLatlonPoint.getLatitude();
+                    place = URLEncoder.encode(place);
+                    String data = "longitude=" + searchLatlonPoint.getLongitude() + "&latitude=" + searchLatlonPoint.getLatitude() + "$place=" + place;
 
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");
@@ -639,7 +647,6 @@ public class page3 extends AppCompatActivity implements LocationSource,
                     //发送完成后的操作
                     try {
                         //第一步，生成Json字符串格式的JSON对象
-                        Log.i("abc",result);
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){

@@ -313,6 +313,6 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
             }
         }
     }
-
-
 }
+
+//TODO: 内存读取权限，图片上传，切后台不定位

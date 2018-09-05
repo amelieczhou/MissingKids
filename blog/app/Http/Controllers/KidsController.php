@@ -94,6 +94,7 @@ class KidsController extends Controller
 
         $longitude = $request->input('longitude');
         $latitude = $request->input('latitude');
+        $place = $request->input('place');
 
         if(empty($longitude) || empty($latitude)){
             return $this->simpleJsonError('经纬度不能为空');
@@ -104,6 +105,7 @@ class KidsController extends Controller
             ->update([
                 'missing_longitude' => $longitude,
                 'missing_latitude' => $latitude,
+                'place' => $place,
             ]);
 
         if(!$res){
@@ -136,8 +138,6 @@ class KidsController extends Controller
         $data = DB::table('missingkids')
             ->select('missing_longitude','missing_latitude')
             ->get();
-
-
         return $this->simpleJsonSuccess($data);
     }
 
@@ -162,4 +162,16 @@ class KidsController extends Controller
         return $this->simpleJsonSuccess($data);
 
     }
+
+    public function getInfo(){
+        $data = DB::table('missingkids')
+            ->select('missing_longitude','missing_latitude')
+            ->get();
+        return $this->simpleJsonSuccess($data);
+
+
+    }
+
+
+
 }

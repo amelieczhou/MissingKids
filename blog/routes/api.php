@@ -39,6 +39,7 @@ Route::group(['middleware'=>['web']], function (){
     Route::post('del','KidsController@del');
     Route::post('getOne','KidsController@getOne');
     Route::get('getAllPosition','KidsController@getAllPosition');
+    Route::get('getInfo','KidsController@getInfo');
 
 });
 
