@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
+import android.support.constraint.solver.Cache;
+import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,8 +22,11 @@ import com.luck.picture.lib.entity.LocalMedia;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.reactivestreams.Subscriber;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -29,10 +35,23 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import okhttp3.Callback;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class page2 extends Activity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
+
     private Context mContext;
     private GridView gridView;
     private ArrayList<String> mPicList = new ArrayList<>(); //上传的图片凭证的数据源
@@ -40,7 +59,9 @@ public class page2 extends Activity implements View.OnClickListener {
     protected Button btn_submit;
     protected EditText et_input;
     public String result;
-    public String sessionid;
+    public List<File> fileList=new ArrayList<File>();
+    private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +72,7 @@ public class page2 extends Activity implements View.OnClickListener {
         gridView = (GridView) findViewById(R.id.gridView);
         btn_submit = findViewById(R.id.button4);
         et_input = findViewById(R.id.et_input);
+
         btn_submit.setOnClickListener(this);
         initGridView();
     }
@@ -81,7 +103,104 @@ public class page2 extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        sendHttpRequest();
+//        sendHttpRequest();
+//        for(int i=0;i<fileList.size();i++) {
+            uploadFile("http://132.232.27.134/api/upload",new File("/storage/emulated/0/PictureSelector/CameraImage/PictureSelector_20180906_203255.JPEG"));
+//       }
+// File file = new File("/storage/emulated/0/PictureSelector/CameraImage/PictureSelector_20180906_203255.JPEG");
+//                .url("http://132.232.27.134/api/upload")
+    }
+
+    OkHttpClient client = new OkHttpClient();
+    private void uploadFile(String url, File file) {
+        // 创建一个RequestBody，文件的类型是image/png
+        RequestBody requestBody = RequestBody.create(MediaType.parse("image/png"), file);
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                // 设置type为"multipart/form-data"，不然无法上传参数
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("source", "PictureSelector_20180906_203255.JPEG", requestBody)
+                .addFormDataPart("comment", "上传一个图片哈哈哈哈")
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(multipartBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                    System.out.println("上传返回：\n" + response.body().string());
+            }
+
+        });
+    }
+
+
+
+
+    //查看大图
+    private void viewPluImg(int position) {
+        Intent intent = new Intent(mContext, PlusImageActivity.class);
+        intent.putStringArrayListExtra(MainConstant.IMG_LIST, mPicList);
+        intent.putExtra(MainConstant.POSITION, position);
+        startActivityForResult(intent, MainConstant.REQUEST_CODE_MAIN);
+    }
+
+    /**
+     * 打开相册或者照相机选择凭证图片，最多5张
+     *
+     * @param maxTotal 最多选择的图片的数量
+     */
+    private void selectPic(int maxTotal) {
+        PictureSelectorConfig.initMultiConfig(this, maxTotal);
+    }
+
+    // 处理选择的照片的地址
+    private void refreshAdapter(List<LocalMedia> picList) {
+        for (LocalMedia localMedia : picList) {
+            Log.i("abc",localMedia.getPath());
+//            photo_loc = localMedia.getPath();
+            File img1=new File(localMedia.getPath());
+            fileList.add(img1);
+
+            //被压缩后的图片路径
+            if (localMedia.isCompressed()) {
+                String compressPath = localMedia.getCompressPath(); //压缩后的图片路径
+//                Log.i("abc", "path:---->" + compressPath);
+                mPicList.add(compressPath); //把图片添加到将要上传的图片数组中
+                mGridViewAddImgAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case PictureConfig.CHOOSE_REQUEST:
+                    // 图片选择结果回调
+                    refreshAdapter(PictureSelector.obtainMultipleResult(data));
+                    // 例如 LocalMedia 里面返回三种path
+                    // 1.media.getPath(); 为原图path
+                    // 2.media.getCutPath();为裁剪后path，需判断media.isCut();是否为true
+                    // 3.media.getCompressPath();为压缩后path，需判断media.isCompressed();是否为true
+                    // 如果裁剪并压缩了，以取压缩路径为准，因为是先裁剪后压缩的
+
+                    break;
+            }
+        }
+        if (requestCode == MainConstant.REQUEST_CODE_MAIN && resultCode == MainConstant.RESULT_CODE_VIEW_IMG) {
+            //查看大图页面删除了图片
+            ArrayList<String> toDeletePicList = data.getStringArrayListExtra(MainConstant.IMG_LIST); //要删除的图片的集合
+            mPicList.clear();
+            mPicList.addAll(toDeletePicList);
+            mGridViewAddImgAdapter.notifyDataSetChanged();
+        }
     }
 
     public void  sendHttpRequest(){
@@ -132,7 +251,7 @@ public class page2 extends Activity implements View.OnClickListener {
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if (status) {
-                            Intent i = new Intent(page2.this, page3.class);
+                            Intent i = new Intent(page2.this, page5.class);
                             startActivity(i);
                             Looper.prepare();
                             Toast.makeText(page2.this, jsonObject.getString("data"), Toast.LENGTH_SHORT).show();
@@ -149,60 +268,5 @@ public class page2 extends Activity implements View.OnClickListener {
             }
         }).start();
 
-    }
-
-    //查看大图
-    private void viewPluImg(int position) {
-        Intent intent = new Intent(mContext, PlusImageActivity.class);
-        intent.putStringArrayListExtra(MainConstant.IMG_LIST, mPicList);
-        intent.putExtra(MainConstant.POSITION, position);
-        startActivityForResult(intent, MainConstant.REQUEST_CODE_MAIN);
-    }
-
-    /**
-     * 打开相册或者照相机选择凭证图片，最多5张
-     *
-     * @param maxTotal 最多选择的图片的数量
-     */
-    private void selectPic(int maxTotal) {
-        PictureSelectorConfig.initMultiConfig(this, maxTotal);
-    }
-
-    // 处理选择的照片的地址
-    private void refreshAdapter(List<LocalMedia> picList) {
-        for (LocalMedia localMedia : picList) {
-            //被压缩后的图片路径
-            if (localMedia.isCompressed()) {
-                String compressPath = localMedia.getCompressPath(); //压缩后的图片路径
-                Log.i("abc", "path:---->" + compressPath);
-                mPicList.add(compressPath); //把图片添加到将要上传的图片数组中
-                mGridViewAddImgAdapter.notifyDataSetChanged();
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case PictureConfig.CHOOSE_REQUEST:
-                    // 图片选择结果回调
-                    refreshAdapter(PictureSelector.obtainMultipleResult(data));
-                    // 例如 LocalMedia 里面返回三种path
-                    // 1.media.getPath(); 为原图path
-                    // 2.media.getCutPath();为裁剪后path，需判断media.isCut();是否为true
-                    // 3.media.getCompressPath();为压缩后path，需判断media.isCompressed();是否为true
-                    // 如果裁剪并压缩了，以取压缩路径为准，因为是先裁剪后压缩的
-                    break;
-            }
-        }
-        if (requestCode == MainConstant.REQUEST_CODE_MAIN && resultCode == MainConstant.RESULT_CODE_VIEW_IMG) {
-            //查看大图页面删除了图片
-            ArrayList<String> toDeletePicList = data.getStringArrayListExtra(MainConstant.IMG_LIST); //要删除的图片的集合
-            mPicList.clear();
-            mPicList.addAll(toDeletePicList);
-            mGridViewAddImgAdapter.notifyDataSetChanged();
-        }
     }
 }

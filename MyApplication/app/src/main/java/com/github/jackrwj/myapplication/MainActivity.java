@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
         if(view.getId() == R.id.login){
             validator.validate();
         }else{
-            Intent i = new Intent(MainActivity.this ,page5.class);
+            Intent i = new Intent(MainActivity.this ,page2.class);
             startActivity(i);
         }
     }

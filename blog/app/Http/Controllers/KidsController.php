@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Tuisong;
 
 class KidsController extends Controller
@@ -170,8 +171,16 @@ class KidsController extends Controller
         return $this->simpleJsonSuccess($data);
     }
 
+    public function upload(Request $request){
+        $file = $request->file('source');
+        if($file->isValid()){
+            $ext = $file->getClientOriginalExtension();
+            $realPath = $file->getRealPath();
+            $filename = date('Y-m-d-H-i-s') . '-' .uniqid() . '.' . $ext;
 
-
-
+            $bool = Storage::disk('upload')->put($filename,file_get_contents($realPath));
+            var_dump($bool);
+        }
+    }
 
 }

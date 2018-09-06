@@ -654,7 +654,7 @@ public class page3 extends AppCompatActivity implements LocationSource,
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){
-                            Intent i = new Intent(page3.this , page4.class);
+                            Intent i = new Intent(page3.this , page2.class);
                             startActivity(i);
                             Looper.prepare();
                             Toast.makeText(page3.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();

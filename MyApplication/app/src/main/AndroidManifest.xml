@@ -72,6 +72,7 @@
         <activity android:name=".page4"></activity>
         <activity android:name=".page5"></activity>
 
+        <activity android:name=".UploadActivity"></activity>
         <!--解决7.0照相机崩问题-->
         <provider
             android:name="android.support.v4.content.FileProvider"

@@ -109,7 +109,6 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
                     connection.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
                     connection.setRequestProperty("Content-Length", data.length()+"");
                     OutputStream outputStream = connection.getOutputStream();
-                    Log.i("abc",data);
                     outputStream.write(data.getBytes());
 
                     int responseCode = connection.getResponseCode();
