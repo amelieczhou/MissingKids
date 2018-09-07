@@ -30,16 +30,15 @@ class UserController extends Controller {
                 ['email',$email],
             ])
             ->first();
-
         if(empty($ad_user) || !Hash::check($request->password,$ad_user->password)){
             return $this->simpleJsonError('账号或密码错误！');
         }
-
         if($ad_user->state == 0){
             return $this->simpleJsonError('账号已经被禁用，请联系系统管理员！');
         }
         session()->put([
             'user_id' => $ad_user->id,
+            'user_email' => $ad_user->email,
         ]);
         return $this->simpleJsonSuccess('登陆成功');
     }
@@ -81,8 +80,7 @@ class UserController extends Controller {
             if(!$res){
                 return $this->simpleJsonError('注册失败，请重试');
             }
-
-
+            Storage::disk('upload')->makeDirectory("/" + $email);
             return $this->simpleJsonSuccess('注册成功');
         }
     }
@@ -90,17 +88,14 @@ class UserController extends Controller {
     public function getPosition(Request $request){
 
         $id = session('user_id');
-//            $id = 67;
+
         if(empty($id)){
-            return $this->simpleJsonError('please login first');
+            return $this->simpleJsonError('please inser first');
         }
 
         $time = $request->input('time');
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
-//        if(empty($time)){
-//            return $this->simpleJsonError('empty input');
-//        }
 
         $result = DB::table('user')
             ->where('id',$id)

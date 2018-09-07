@@ -314,7 +314,7 @@ public class page1 extends Activity implements View.OnClickListener ,Validator.V
                         JSONObject jsonObject = new JSONObject(result);
                         Boolean status = jsonObject.getBoolean("success");
                         if(status){
-                            Intent i = new Intent(page1.this , page3.class);
+                            Intent i = new Intent(page1.this , page2.class);
                             startActivity(i);
                             Looper.prepare();
                             Toast.makeText(page1.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();

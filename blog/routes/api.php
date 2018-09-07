@@ -40,7 +40,8 @@ Route::group(['middleware'=>['web']], function (){
     Route::post('getOne','KidsController@getOne');
     Route::get('getAllPosition','KidsController@getAllPosition');
     Route::get('getAllInfo','KidsController@getAllInfo');
-    Route::post('upload','KidsController@upload');
+    Route::post('uploadPic','KidsController@uploadPic');
+    Route::post('uploadDes','KidsController@uploadDes');
 
 });
 

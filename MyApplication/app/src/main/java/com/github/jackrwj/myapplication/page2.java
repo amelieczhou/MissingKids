@@ -1,7 +1,9 @@
 package com.github.jackrwj.myapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -62,7 +64,6 @@ public class page2 extends Activity implements View.OnClickListener {
     public List<File> fileList=new ArrayList<File>();
     private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,42 +104,135 @@ public class page2 extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-//        sendHttpRequest();
-//        for(int i=0;i<fileList.size();i++) {
-            uploadFile("http://132.232.27.134/api/upload",new File("/storage/emulated/0/PictureSelector/CameraImage/PictureSelector_20180906_203255.JPEG"));
-//       }
-// File file = new File("/storage/emulated/0/PictureSelector/CameraImage/PictureSelector_20180906_203255.JPEG");
-//                .url("http://132.232.27.134/api/upload")
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("提示")//设置对话框的标题
+                .setMessage("确认提交表单吗？此操作不可恢复")//设置对话框的内容
+                //设置对话框的按钮
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendHttp();
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    public void sendHttp(){
+        for(int i=0;i<fileList.size();i++) {
+            uploadPic("http://132.232.27.134/api/uploadPic", new File(fileList.get(i).getAbsolutePath()));
+        }
     }
 
     OkHttpClient client = new OkHttpClient();
-    private void uploadFile(String url, File file) {
+    private void uploadPic(String url, File file) {
+        String cookie = page1.cookieString;
         // 创建一个RequestBody，文件的类型是image/png
         RequestBody requestBody = RequestBody.create(MediaType.parse("image/png"), file);
         MultipartBody multipartBody = new MultipartBody.Builder()
-                // 设置type为"multipart/form-data"，不然无法上传参数
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("source", "PictureSelector_20180906_203255.JPEG", requestBody)
-                .addFormDataPart("comment", "上传一个图片哈哈哈哈")
+                .addFormDataPart("source", file.getName(),requestBody)
+                .addFormDataPart("comment", "上传一个图片")
                 .build();
         Request request = new Request.Builder()
+                .addHeader("Cookie",cookie)
                 .url(url)
                 .post(multipartBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
-
             }
 
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                    System.out.println("上传返回：\n" + response.body().string());
+                result = response.body().string();
+                System.out.println("上传返回：\n" + result);
+                if(response.code() == 200){
+                    try {
+                        //第一步，生成Json字符串格式的JSON对象
+                        JSONObject jsonObject = new JSONObject(result);
+                        Boolean status = jsonObject.getBoolean("success");
+                        if(status){
+                            uploadDes("http://132.232.27.134/api/uploadDes");
+                            Looper.prepare();
+                            Toast.makeText(page2.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }else{
+                            Looper.prepare();
+                            Toast.makeText(page2.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    Looper.prepare();
+                    Toast.makeText(page2.this,"上传失败，请检查网络",Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
             }
-
         });
     }
 
+    private void uploadDes(String url) {
+        String cookie = page1.cookieString;
+        // 创建一个RequestBody，文件的类型是image/png
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("image/png"), file);
+        String text = et_input.getText().toString();
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+//                .addFormDataPart("source", file.getName(),requestBody)
+                .addFormDataPart("description",text)
+                .build();
+        Request request = new Request.Builder()
+                .addHeader("Cookie",cookie)
+                .url(url)
+                .post(multipartBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+            }
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                result = response.body().string();
+                System.out.println("上传返回：\n" + result);
+                if(response.code() == 200){
+                    try {
+                        //第一步，生成Json字符串格式的JSON对象
+                        JSONObject jsonObject = new JSONObject(result);
+                        Boolean status = jsonObject.getBoolean("success");
+                        if(status){
+                            Intent i = new Intent(page2.this ,page3.class);
+                            startActivity(i);
+                            Looper.prepare();
+                            Toast.makeText(page2.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }else{
+                            Looper.prepare();
+                            Toast.makeText(page2.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
+                            Looper.loop();
+                        }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    Looper.prepare();
+                    Toast.makeText(page2.this,"上传失败，请检查网络",Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+            }
+        });
+    }
 
 
 
@@ -155,9 +249,7 @@ public class page2 extends Activity implements View.OnClickListener {
      *
      * @param maxTotal 最多选择的图片的数量
      */
-    private void selectPic(int maxTotal) {
-        PictureSelectorConfig.initMultiConfig(this, maxTotal);
-    }
+    private void selectPic(int maxTotal) { PictureSelectorConfig.initMultiConfig(this, maxTotal); }
 
     // 处理选择的照片的地址
     private void refreshAdapter(List<LocalMedia> picList) {
@@ -203,70 +295,5 @@ public class page2 extends Activity implements View.OnClickListener {
         }
     }
 
-    public void  sendHttpRequest(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String cookie = page1.cookieString;
-                String text = et_input.getText().toString();
-                text = URLEncoder.encode(text);
-//               String path = "http://10.0.2.2:8000/api/addDescAndPic";
-                String path = "http://132.232.27.134/api/addDescAndPic";
 
-                try {
-                    URL url = new URL(path);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setConnectTimeout(5000);
-                    connection.setRequestMethod("POST");
-
-                    String data = "description=" + text + "&picture=" + "44444";
-
-                    connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                    connection.setRequestProperty("Content-Length", data.length() + "");
-                    connection.setRequestProperty("Cookie", cookie);
-                    OutputStream outputStream = connection.getOutputStream();
-                    outputStream.write(data.getBytes());
-
-                    int responseCode = connection.getResponseCode();
-                    if (responseCode == 200) {
-                        InputStream in = connection.getInputStream();
-                        BufferedReader reader = null;
-                        reader = new BufferedReader(new InputStreamReader(in));
-                        StringBuilder response = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            response.append(line);
-                        }
-                        result = response.toString();
-                        Log.i("abc", result);
-                    } else {
-                        Toast.makeText(page2.this, "no", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    //发送完成后的操作
-                    try {
-                        //第一步，生成Json字符串格式的JSON对象
-                        JSONObject jsonObject = new JSONObject(result);
-                        Boolean status = jsonObject.getBoolean("success");
-                        if (status) {
-                            Intent i = new Intent(page2.this, page5.class);
-                            startActivity(i);
-                            Looper.prepare();
-                            Toast.makeText(page2.this, jsonObject.getString("data"), Toast.LENGTH_SHORT).show();
-                            Looper.loop();
-                        } else {
-                            Looper.prepare();
-                            Toast.makeText(page2.this, jsonObject.getString("data"), Toast.LENGTH_SHORT).show();
-                            Looper.loop();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
-
-    }
 }
