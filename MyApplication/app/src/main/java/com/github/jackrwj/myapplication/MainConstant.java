@@ -3,7 +3,7 @@ package com.github.jackrwj.myapplication;
 
 
 public class MainConstant {
-    public static final String IMG_LIST = "img_list"; //第几张图片
+    public static final String IMG_LIST = "img_list"; //图片列表
     public static final String POSITION = "position"; //第几张图片
     public static final String PIC_PATH = "pic_path"; //图片路径
     public static final int MAX_SELECT_PIC_NUM = 5; // 最多上传5张图片

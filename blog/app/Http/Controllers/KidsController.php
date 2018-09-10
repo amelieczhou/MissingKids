@@ -1,6 +1,9 @@
 <?php
 
+
 namespace App\Http\Controllers;
+define('EARTH_RADIUS', 6378.137);//地球半径
+define('PI', 3.1415926);
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -9,6 +12,8 @@ use Tuisong;
 
 class KidsController extends Controller
 {
+
+
     /**
      * @param Request $request
      * @return array
@@ -64,8 +69,6 @@ class KidsController extends Controller
         ]);
         return $this->simpleJsonSuccess('表单填写成功');
     }
-
-
 
 
 
@@ -195,7 +198,11 @@ class KidsController extends Controller
     }
 
 
-
+    /**
+     * 上传图片
+     * @param Request $request
+     * @return array
+     */
     public function uploadPic(Request $request){
         $file = $request->file('source');
         $id = session('kid_id');
@@ -226,8 +233,13 @@ class KidsController extends Controller
 
         return $this->simpleJsonError('上传图片无效');
 
-
     }
+
+    /**
+     * 上传描述
+     * @param Request $request
+     * @return array
+     */
 
     public function uploadDes(Request $request){
         $id = session('kid_id');
@@ -251,5 +263,63 @@ class KidsController extends Controller
         }
         return $this->simpleJsonSuccess('填写成功');
     }
+
+
+
+    public function getAllPic(Request $request){
+        //获取当前的url
+//        $realpath = str_replace('sysimg/','',Request::path());
+//        $path = storage_path() . $realpath;
+        $path = storage_path() . '/app/upload/2018-09-07-10-13-28-5b924f48cc84d.jpg';
+        var_dump($path);
+//        if(!file_exists($path)){
+//            //报404错误
+//            header("HTTP/1.1 404 Not Found");
+//            header("Status: 404 Not Found");
+//            exit;
+//        }
+//        //输出图片
+//        header('Content-type: image/jpg');
+//        echo file_get_contents($path);
+    }
+
+    public function News(Request $request){
+        $kids_latitude = DB::table('missingkids')
+            ->pluck('missing_latitude');
+        $kids_len = $kids_latitude->count();
+
+        $kids_longitude = DB::table('missingkids')
+            ->pluck('missing_longitude');
+
+
+
+        $user_longigude = DB::table('user')
+            ->pluck('longitude');
+        $user_len = $user_longigude->count();
+
+        $user_latitude = DB::table('user')
+            ->pluck('latitude');
+
+        for($i=0; $i<$kids_len; $i++){
+            for($j=0; $j<$user_len; $j++){
+                if($this->GetDistance($kids_latitude[$i],$kids_longitude[$i],$user_latitude[$j],$user_longigude[$j],1) < 500 ){
+
+                }
+            }
+        }
+
+//        $latitude = DB::table('missingkids')
+//            ->where('id',89)
+//            ->value('missing_latitude');
+
+
+//        echo $this->GetDistance(39.908156,116.4767, 39.908452,116.450479, 1);//输出距离/米
+//        echo $this->GetDistance($kids_latitude[0],$kids_longitude[0],$user_latitude[1],$user_longigude[1],1);//输出距离/米
+
+    }
+
+
+
+
 
 }

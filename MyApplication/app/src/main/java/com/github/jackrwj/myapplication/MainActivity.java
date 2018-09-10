@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        continueCount = 0;
         et_email = findViewById(R.id.email_edit);
         et_pwd = findViewById(R.id.password_edit);
         btn_login = findViewById(R.id.login);
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
         if(view.getId() == R.id.login){
             validator.validate();
         }else{
-            Intent i = new Intent(MainActivity.this ,page1.class);
+            Intent i = new Intent(MainActivity.this ,page5.class);
             startActivity(i);
         }
     }

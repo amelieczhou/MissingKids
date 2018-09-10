@@ -42,13 +42,9 @@ abstract class BaseFlingAdapterView extends AdapterView {
     }
 
 
-    public int getWidthMeasureSpec() {
-        return widthMeasureSpec;
-    }
+    public int getWidthMeasureSpec() { return widthMeasureSpec;}
 
-    public int getHeightMeasureSpec() {
-        return heightMeasureSpec;
-    }
+    public int getHeightMeasureSpec() { return heightMeasureSpec; }
 
 
 

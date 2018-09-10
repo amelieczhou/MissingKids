@@ -50,6 +50,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.github.jackrwj.myapplication.MainConstant.RESULT_CODE_VIEW_IMG;
+
 public class page2 extends Activity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
@@ -61,8 +63,7 @@ public class page2 extends Activity implements View.OnClickListener {
     protected Button btn_submit;
     protected EditText et_input;
     public String result;
-    public List<File> fileList=new ArrayList<File>();
-    private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
+//    public List<File> fileList=new ArrayList<File>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,6 @@ public class page2 extends Activity implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
                     }
                 })
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -125,8 +125,20 @@ public class page2 extends Activity implements View.OnClickListener {
     }
 
     public void sendHttp(){
-        for(int i=0;i<fileList.size();i++) {
-            uploadPic("http://132.232.27.134/api/uploadPic", new File(fileList.get(i).getAbsolutePath()));
+        String text = et_input.getText().toString();
+        if(mPicList.size() == 0){
+            Toast.makeText(page2.this,"照片不能为空",Toast.LENGTH_SHORT).show();
+        }else if(text.length() == 0){
+            Toast.makeText(page2.this,"描述不能为空",Toast.LENGTH_SHORT).show();
+        }else {
+//            for (int i = 0; i < fileList.size(); i++) {
+//                uploadPic("http://132.232.27.134/api/uploadPic", new File(fileList.get(i).getAbsolutePath()));
+//            }
+
+            for (int i = 0; i < mPicList.size(); i++) {
+                uploadPic("http://132.232.27.134/api/uploadPic", new File(mPicList.get(i)));
+            }
+            uploadDes("http://132.232.27.134/api/uploadDes");
         }
     }
 
@@ -156,19 +168,11 @@ public class page2 extends Activity implements View.OnClickListener {
                 System.out.println("上传返回：\n" + result);
                 if(response.code() == 200){
                     try {
-                        //第一步，生成Json字符串格式的JSON对象
                         JSONObject jsonObject = new JSONObject(result);
-                        Boolean status = jsonObject.getBoolean("success");
-                        if(status){
-                            uploadDes("http://132.232.27.134/api/uploadDes");
-                            Looper.prepare();
-                            Toast.makeText(page2.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
-                            Looper.loop();
-                        }else{
-                            Looper.prepare();
-                            Toast.makeText(page2.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
-                            Looper.loop();
-                        }
+//                        Boolean status = jsonObject.getBoolean("success");
+                        Looper.prepare();
+                        Toast.makeText(page2.this,jsonObject.getString("data"),Toast.LENGTH_SHORT).show();
+                        Looper.loop();
                     }
                     catch (Exception e) {
                         e.printStackTrace();
@@ -253,19 +257,25 @@ public class page2 extends Activity implements View.OnClickListener {
 
     // 处理选择的照片的地址
     private void refreshAdapter(List<LocalMedia> picList) {
+//        fileList.clear();
         for (LocalMedia localMedia : picList) {
-            Log.i("abc",localMedia.getPath());
-//            photo_loc = localMedia.getPath();
-            File img1=new File(localMedia.getPath());
-            fileList.add(img1);
+//            Log.i("abc",localMedia.getPath());
+
+//            File img1=new File(localMedia.getPath());
+//            fileList.add(img1);
 
             //被压缩后的图片路径
             if (localMedia.isCompressed()) {
                 String compressPath = localMedia.getCompressPath(); //压缩后的图片路径
-//                Log.i("abc", "path:---->" + compressPath);
+                Log.i("abc", "path:---->" + compressPath);
                 mPicList.add(compressPath); //把图片添加到将要上传的图片数组中
                 mGridViewAddImgAdapter.notifyDataSetChanged();
             }
+        }
+
+        Log.i("abc","--------------------------------" + String.valueOf(mPicList.size()));
+        for(int i=0;i<mPicList.size();i++){
+            Log.i("abc",mPicList.get(i));
         }
     }
 
@@ -273,10 +283,13 @@ public class page2 extends Activity implements View.OnClickListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
+//        if (resultCode == RESULT_CODE_VIEW_IMG) {
             switch (requestCode) {
                 case PictureConfig.CHOOSE_REQUEST:
                     // 图片选择结果回调
                     refreshAdapter(PictureSelector.obtainMultipleResult(data));
+
+//                    mPicList = data.getStringArrayListExtra(MainConstant.IMG_LIST);
                     // 例如 LocalMedia 里面返回三种path
                     // 1.media.getPath(); 为原图path
                     // 2.media.getCutPath();为裁剪后path，需判断media.isCut();是否为true
@@ -286,7 +299,7 @@ public class page2 extends Activity implements View.OnClickListener {
                     break;
             }
         }
-        if (requestCode == MainConstant.REQUEST_CODE_MAIN && resultCode == MainConstant.RESULT_CODE_VIEW_IMG) {
+        if (requestCode == MainConstant.REQUEST_CODE_MAIN && resultCode == RESULT_CODE_VIEW_IMG) {
             //查看大图页面删除了图片
             ArrayList<String> toDeletePicList = data.getStringArrayListExtra(MainConstant.IMG_LIST); //要删除的图片的集合
             mPicList.clear();

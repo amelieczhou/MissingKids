@@ -37,14 +37,10 @@ public class GridViewAdapter extends android.widget.BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
-        return mList.get(position);
-    }
+    public Object getItem(int position) { return mList.get(position); }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    public long getItemId(int position) { return position; }
     
 
     @Override

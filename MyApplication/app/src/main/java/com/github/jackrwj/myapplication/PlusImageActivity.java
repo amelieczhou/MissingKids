@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -65,7 +66,10 @@ public class PlusImageActivity extends AppCompatActivity implements ViewPager.On
     //返回上一个页面
     private void back() {
         Intent intent = getIntent();
+//        Intent intent = new Intent();
         intent.putStringArrayListExtra(MainConstant.IMG_LIST, imgList);
+
+        Log.i("abc",String.valueOf(imgList.size()));
         setResult(MainConstant.RESULT_CODE_VIEW_IMG, intent);
         finish();
     }

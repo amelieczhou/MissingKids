@@ -42,6 +42,14 @@ Route::group(['middleware'=>['web']], function (){
     Route::get('getAllInfo','KidsController@getAllInfo');
     Route::post('uploadPic','KidsController@uploadPic');
     Route::post('uploadDes','KidsController@uploadDes');
+    Route::get('getAllPic','KidsController@getAllPic');
+    Route::post('news','KidsController@News');
+
+//    Route::get('imgsys/{one?}/{two?}/{three?}/{four?}/{five?}/{six?}/{seven?}/{eight?}/{nine?}',function(){
+//        \App\Util\ImageRoute::imageStorageRoute();
+//    });
+
+
 
 });
 

@@ -1,6 +1,7 @@
 package com.github.jackrwj.myapplication;
 
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
@@ -228,6 +229,7 @@ public class page5 extends AppCompatActivity implements SwipeFlingAdapterView.on
         }).start();
     }
 
+    @SuppressLint("StaticFieldLeak")
     private void loadData() {
         new AsyncTask<Void, Void, List<Talent>>() {
             @Override
@@ -242,7 +244,7 @@ public class page5 extends AppCompatActivity implements SwipeFlingAdapterView.on
 //                    talent.educationName = edus[ran.nextInt(edus.length-1)];
 //                    talent.workYearName = years[ran.nextInt(years.length-1)];
 
-                    talent.headerIcon = headerIcons[i];
+//                    talent.headerIcon = headerIcons[i];
                     talent.nickname = names[i];
                     talent.cityName = citys[i];
                     talent.educationName = edus[i];
