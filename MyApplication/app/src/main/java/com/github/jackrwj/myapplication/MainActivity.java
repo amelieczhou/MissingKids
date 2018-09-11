@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,19 +13,17 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.baidu.android.pushservice.PushConstants;
+import com.baidu.android.pushservice.PushManager;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.Order;
 import com.mobsandgeeks.saripaar.annotation.Password;
 
-
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,6 +35,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
 
 
 public class MainActivity extends AppCompatActivity implements Validator.ValidationListener,View.OnClickListener {
@@ -74,7 +72,11 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
 
         validator = new Validator(this);
         validator.setValidationListener(this);
+
+        PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY,"rndcE1GaQtHwdCyVgadFlOKU ");
+
     }
+
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.login){
