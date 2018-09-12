@@ -70,6 +70,7 @@ public class RegisterActivity extends Activity implements Validator.ValidationLi
         validator = new Validator(this);
         validator.setValidationListener(this);
         initView();
+        Log.i("abc","aaa");
 
     }
 

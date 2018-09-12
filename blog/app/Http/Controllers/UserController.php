@@ -80,7 +80,7 @@ class UserController extends Controller {
             if(!$res){
                 return $this->simpleJsonError('注册失败，请重试');
             }
-            Storage::disk('upload')->makeDirectory("/" + $email);
+//            Storage::disk('upload')->makeDirectory("/" + $email);
             return $this->simpleJsonSuccess('注册成功');
         }
     }
