@@ -303,7 +303,7 @@ class KidsController extends Controller
         for($i=0; $i<$kids_len; $i++){
             for($j=0; $j<$user_len; $j++){
                 if($this->GetDistance($kids_latitude[$i],$kids_longitude[$i],$user_latitude[$j],$user_longigude[$j],1) < 500 ){
-
+                    return $this->GetDistance($kids_latitude[$i],$kids_longitude[$i],$user_latitude[$j],$user_longigude[$j],1);
                 }
             }
         }

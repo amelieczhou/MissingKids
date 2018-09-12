@@ -12,7 +12,7 @@
             android:id="@+id/button5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="请求儿童信息" />
+            android:text="下一页" />
     </com.amap.api.maps.MapView>
 
     <LinearLayout

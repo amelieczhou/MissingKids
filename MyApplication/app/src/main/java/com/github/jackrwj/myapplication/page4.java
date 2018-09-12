@@ -1,5 +1,6 @@
 package com.github.jackrwj.myapplication;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class page4 extends AppCompatActivity implements AMap.OnMapLoadedListener
     private LatLng location;
     private Button btncenter;
     private Button btnzoom;
+    private Button next;
     private MarkerOverlay markerOverlay;
 
 
@@ -87,8 +89,10 @@ public class page4 extends AppCompatActivity implements AMap.OnMapLoadedListener
         aMap.setOnMapLoadedListener(this); //地图加载完成监听
         btncenter = (Button) findViewById(R.id.btn_center);
         btnzoom = (Button)findViewById(R.id.btn_zoom);
+        next = findViewById(R.id.button5);
         btncenter.setOnClickListener(this);
         btnzoom.setOnClickListener(this);
+        next.setOnClickListener(this);
 
         mSensorHelper = new SensorEventHelper(this);
         if (mSensorHelper != null) {
@@ -210,6 +214,10 @@ public class page4 extends AppCompatActivity implements AMap.OnMapLoadedListener
                 break;
             case R.id.btn_zoom:
                 zoomToSpan();
+                break;
+            case R.id.button5:
+                Intent i = new Intent(page4.this ,page5.class);
+                startActivity(i);
             default:
                 break;
         }
