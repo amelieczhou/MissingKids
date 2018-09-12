@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY,"rndcE1GaQtHwdCyVgadFlOKU");
         continueCount = 0;
         et_email = findViewById(R.id.email_edit);
         et_pwd = findViewById(R.id.password_edit);
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements Validator.Validat
         validator = new Validator(this);
         validator.setValidationListener(this);
 
-        PushManager.startWork(getApplicationContext(), PushConstants.LOGIN_TYPE_API_KEY,"rndcE1GaQtHwdCyVgadFlOKU ");
+
 
     }
 

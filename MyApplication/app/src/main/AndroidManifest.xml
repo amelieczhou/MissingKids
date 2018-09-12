@@ -53,9 +53,9 @@
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER"/>
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+
     <!-- 适配Android N系统必需的ContentProvider写权限声明，写权限包含应用包名-->
     <uses-permission android:name="baidu.push.permission.WRITE_PUSHINFOPROVIDER.com.github.jackrwj.myapplication" />
-
     <permission
         android:name="baidu.push.permission.WRITE_PUSHINFOPROVIDER.com.github.jackrwj.myapplication"
         android:protectionLevel="signature">
@@ -153,7 +153,6 @@
             android:exported="true" />
 
         <!-- push结束 -->
-
         <!-- 此处Receiver名字修改为当前包名路径 -->
         <receiver android:name="com.github.jackrwj.myapplication.PushTestReceiver">
             <intent-filter>
@@ -166,7 +165,11 @@
             </intent-filter>
         </receiver>
 
-
-
     </application>
+
+
+
+
+
+
 </manifest>
